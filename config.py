@@ -24,6 +24,8 @@ CONFIG_FILE = get_config_path()
 class ConfigManager:
     def __init__(self):
         self.config = configparser.ConfigParser()
+        # 保留 option 名稱的原始大小寫
+        self.config.optionxform = str
         self.config_file = CONFIG_FILE
         if not os.path.exists(self.config_file):
             self.create_default_config()

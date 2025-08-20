@@ -80,6 +80,13 @@ spec.md
 task.md
 requirements.md
 
+# DMG creation files
+dmg_temp/
+*.dmg
+
+# Test files
+test_db_read.py
+
 # PyQt generated files
 *.qrc.py
 

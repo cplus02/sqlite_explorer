@@ -191,53 +191,13 @@ class AddConnectionDialog(QDialog):
         try:
             # 如果是編輯現有連線，先刪除舊的連線記錄
             if self.connection_name:
-                print(f"BEFORE edit - editing connection: '{self.connection_name}'")
-                print(f"Dialog ConfigManager config file: {self.config_manager.config_file}")
-                all_connections_before = dict(self.config_manager.get_all_connections())
-                print(f"BEFORE edit - all connections: {list(all_connections_before.keys())}")
-                
-                # 簡單直接的方法：只刪除原始連線
-                if self.connection_name in all_connections_before:
-                    print(f"Removing original connection: '{self.connection_name}'")
-                    self.config_manager.remove_connection(self.connection_name)
-                    
-                    # 強制保存配置
-                    self.config_manager.save_config()
-                    print("Config saved after removal")
-                    
-                    # 立即檢查是否真的被刪除
-                    all_connections_after_remove = dict(self.config_manager.get_all_connections())
-                    print(f"AFTER remove - all connections: {list(all_connections_after_remove.keys())}")
-                    
-                    if self.connection_name in all_connections_after_remove:
-                        print(f"ERROR: Connection '{self.connection_name}' still exists after removal!")
-                    else:
-                        print(f"SUCCESS: Connection '{self.connection_name}' was removed")
-                else:
-                    print(f"WARNING: Connection '{self.connection_name}' not found in config!")
+                self.config_manager.remove_connection(self.connection_name)
 
-            print(f"Adding new connection: '{name}' -> {path}")
             self.config_manager.add_connection(name, path)
-            
-            # 強制保存配置
-            self.config_manager.save_config()
-            print("Config saved to file")
-            
-            # 驗證配置檔案內容
-            with open(self.config_manager.config_file, 'r') as f:
-                file_content = f.read()
-                print(f"Config file content after save:\n{file_content}")
-            
-            # 檢查最終結果
-            final_connections = dict(self.config_manager.get_all_connections())
-            print(f"FINAL - all connections: {list(final_connections.keys())}")
-            print(f"FINAL - new connection exists: {name in final_connections}")
-            print(f"FINAL - old connection exists: {self.connection_name in final_connections if self.connection_name else 'N/A'}")
             self.accept()
         except Exception as e:
             from PyQt5.QtWidgets import QMessageBox
             QMessageBox.critical(self, "Error", f"Failed to save connection: {str(e)}")
-            print(f"Error saving connection: {e}")  # 調試信息
 
 class RecordEditDialog(QDialog):
     def __init__(self, parent, table_name, columns, row_data=None, table_schema=None):

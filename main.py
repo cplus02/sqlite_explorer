@@ -924,20 +924,11 @@ class MainWindow(QMainWindow):
 
     def load_connections(self):
         """載入所有連接到列表"""
-        print("Loading connections...")  # 調試信息
-        print(f"Main ConfigManager config file: {self.config_manager.config_file}")
         self.connection_list.clear()
         
         # 重新讀取配置以確保同步
         self.config_manager.reload_config()
-        
-        # 驗證主程式讀取的配置檔案內容
-        with open(self.config_manager.config_file, 'r') as f:
-            file_content = f.read()
-            print(f"Main - Config file content after reload:\n{file_content}")
-        
         connections = self.config_manager.get_all_connections()
-        print(f"Found {len(connections)} connections: {list(connections.keys())}")  # 調試信息
         
         if not connections:
             # 顯示無連接狀態
@@ -945,11 +936,9 @@ class MainWindow(QMainWindow):
             no_conn_item.setFlags(Qt.NoItemFlags)  # 不可選擇
             no_conn_item.setForeground(QColor(150, 150, 150))
             self.connection_list.addItem(no_conn_item)
-            print("Added 'No connections' item")  # 調試信息
         else:
             for name in connections.keys():
                 self.connection_list.addItem(name)
-                print(f"Added connection: {name}")  # 調試信息
                 
             # 如果有當前連接，選中它
             if self.current_db_path:
@@ -960,12 +949,10 @@ class MainWindow(QMainWindow):
                         path = self.config_manager.get_connection(name)
                         if path == self.current_db_path:
                             self.connection_list.setCurrentItem(item)
-                            print(f"Selected current connection: {name}")  # 調試信息
                             break
         
         # 更新按鈕狀態
         self.update_connection_buttons()
-        print("Connections loaded and UI updated")  # 調試信息
 
     def on_connection_selected(self, item):
         """處理連接選擇"""
@@ -1055,11 +1042,9 @@ class MainWindow(QMainWindow):
         result = dialog.exec_()
         if result == QDialog.Accepted:
             # 重新載入連接列表
-            print("Connection dialog accepted, reloading connections...")  # 調試信息
             self.load_connections()
-            print("Connection list reloaded")  # 調試信息
         else:
-            print("Dialog was cancelled or rejected")  # 調試信息
+            pass
 
     def edit_connection(self):
         """編輯選中的連接"""

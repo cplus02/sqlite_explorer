@@ -189,12 +189,28 @@ class AddConnectionDialog(QDialog):
             return
 
         try:
-            # 如果是編輯現有連線，先刪除舊的連線記錄
+            # 如果是編輯現有連線，先刪除舊的連線記錄（包括大小寫不同的重複項）
             if self.connection_name:
-                self.config_manager.remove_connection(self.connection_name)
+                all_connections = self.config_manager.get_all_connections()
+                
+                # 刪除原本的連線
+                if self.connection_name in all_connections:
+                    self.config_manager.remove_connection(self.connection_name)
+                
+                # 清理大小寫不同但指向同一路徑的重複連線
+                original_path = all_connections.get(self.connection_name)
+                if original_path:
+                    # 查找並刪除指向同一路徑的其他連線
+                    connections_to_remove = []
+                    for conn_name, conn_path in all_connections.items():
+                        if conn_path == original_path and conn_name.lower() == self.connection_name.lower() and conn_name != self.connection_name:
+                            connections_to_remove.append(conn_name)
+                    
+                    for conn_to_remove in connections_to_remove:
+                        self.config_manager.remove_connection(conn_to_remove)
 
             self.config_manager.add_connection(name, path)
-            print(f"Saving connection: {name} -> {path}")  # 調試信息
+            print(f"Saved connection: {name} -> {path}")  # 調試信息
             self.accept()
         except Exception as e:
             from PyQt5.QtWidgets import QMessageBox

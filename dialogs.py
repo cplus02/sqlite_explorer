@@ -189,28 +189,50 @@ class AddConnectionDialog(QDialog):
             return
 
         try:
-            # 如果是編輯現有連線，先刪除舊的連線記錄（包括大小寫不同的重複項）
+            # 如果是編輯現有連線，先刪除舊的連線記錄
             if self.connection_name:
-                all_connections = self.config_manager.get_all_connections()
+                print(f"BEFORE edit - editing connection: '{self.connection_name}'")
+                print(f"Dialog ConfigManager config file: {self.config_manager.config_file}")
+                all_connections_before = dict(self.config_manager.get_all_connections())
+                print(f"BEFORE edit - all connections: {list(all_connections_before.keys())}")
                 
-                # 刪除原本的連線
-                if self.connection_name in all_connections:
+                # 簡單直接的方法：只刪除原始連線
+                if self.connection_name in all_connections_before:
+                    print(f"Removing original connection: '{self.connection_name}'")
                     self.config_manager.remove_connection(self.connection_name)
-                
-                # 清理大小寫不同但指向同一路徑的重複連線
-                original_path = all_connections.get(self.connection_name)
-                if original_path:
-                    # 查找並刪除指向同一路徑的其他連線
-                    connections_to_remove = []
-                    for conn_name, conn_path in all_connections.items():
-                        if conn_path == original_path and conn_name.lower() == self.connection_name.lower() and conn_name != self.connection_name:
-                            connections_to_remove.append(conn_name)
                     
-                    for conn_to_remove in connections_to_remove:
-                        self.config_manager.remove_connection(conn_to_remove)
+                    # 強制保存配置
+                    self.config_manager.save_config()
+                    print("Config saved after removal")
+                    
+                    # 立即檢查是否真的被刪除
+                    all_connections_after_remove = dict(self.config_manager.get_all_connections())
+                    print(f"AFTER remove - all connections: {list(all_connections_after_remove.keys())}")
+                    
+                    if self.connection_name in all_connections_after_remove:
+                        print(f"ERROR: Connection '{self.connection_name}' still exists after removal!")
+                    else:
+                        print(f"SUCCESS: Connection '{self.connection_name}' was removed")
+                else:
+                    print(f"WARNING: Connection '{self.connection_name}' not found in config!")
 
+            print(f"Adding new connection: '{name}' -> {path}")
             self.config_manager.add_connection(name, path)
-            print(f"Saved connection: {name} -> {path}")  # 調試信息
+            
+            # 強制保存配置
+            self.config_manager.save_config()
+            print("Config saved to file")
+            
+            # 驗證配置檔案內容
+            with open(self.config_manager.config_file, 'r') as f:
+                file_content = f.read()
+                print(f"Config file content after save:\n{file_content}")
+            
+            # 檢查最終結果
+            final_connections = dict(self.config_manager.get_all_connections())
+            print(f"FINAL - all connections: {list(final_connections.keys())}")
+            print(f"FINAL - new connection exists: {name in final_connections}")
+            print(f"FINAL - old connection exists: {self.connection_name in final_connections if self.connection_name else 'N/A'}")
             self.accept()
         except Exception as e:
             from PyQt5.QtWidgets import QMessageBox

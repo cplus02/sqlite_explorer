@@ -925,10 +925,17 @@ class MainWindow(QMainWindow):
     def load_connections(self):
         """載入所有連接到列表"""
         print("Loading connections...")  # 調試信息
+        print(f"Main ConfigManager config file: {self.config_manager.config_file}")
         self.connection_list.clear()
         
-        # 重新讀取配置
+        # 重新讀取配置以確保同步
         self.config_manager.reload_config()
+        
+        # 驗證主程式讀取的配置檔案內容
+        with open(self.config_manager.config_file, 'r') as f:
+            file_content = f.read()
+            print(f"Main - Config file content after reload:\n{file_content}")
+        
         connections = self.config_manager.get_all_connections()
         print(f"Found {len(connections)} connections: {list(connections.keys())}")  # 調試信息
         

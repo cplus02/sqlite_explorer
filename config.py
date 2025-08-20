@@ -33,6 +33,8 @@ class ConfigManager:
             self.config.read(self.config_file)
 
     def reload_config(self):
+        # 清除現有配置然後重新讀取
+        self.config.clear()
         self.config.read(self.config_file)
 
     def create_default_config(self):

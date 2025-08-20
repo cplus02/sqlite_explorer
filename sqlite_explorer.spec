@@ -8,8 +8,6 @@ a = Analysis(
     binaries=[],
     datas=[
         ('icons/*.png', 'icons'),
-        ('config.ini', '.'),
-        ('*.db', '.'),
     ],
     hiddenimports=[
         'PyQt5.QtCore',

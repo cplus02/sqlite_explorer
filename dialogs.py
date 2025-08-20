@@ -189,7 +189,8 @@ class AddConnectionDialog(QDialog):
             return
 
         try:
-            if self.connection_name and self.connection_name != name:
+            # 如果是編輯現有連線，先刪除舊的連線記錄
+            if self.connection_name:
                 self.config_manager.remove_connection(self.connection_name)
 
             self.config_manager.add_connection(name, path)

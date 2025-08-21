@@ -64,8 +64,8 @@ app = BUNDLE(
     bundle_identifier='com.sqlite.explorer',
     info_plist={
         'NSHighResolutionCapable': 'True',
-        'CFBundleShortVersionString': '1.0.0',
-        'CFBundleVersion': '1.0.0',
+        'CFBundleShortVersionString': '1.1.1',
+        'CFBundleVersion': '1.1.1',
         'CFBundleName': 'SQLite Explorer',
         'CFBundleDisplayName': 'SQLite Explorer',
         'NSRequiresAquaSystemAppearance': 'False',

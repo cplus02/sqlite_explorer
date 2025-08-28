@@ -75,16 +75,52 @@ class DBHandler(QObject):
         """獲取表格結構"""
         if not self.connection:
             return []
-        
+
         try:
             cursor = self.connection.cursor()
             cursor.execute(f"PRAGMA table_info({table_name});")
             schema = cursor.fetchall()
-            
+
             return schema
-            
+
         except Exception as e:
             print(f"獲取表格結構時發生錯誤: {e}")
+            return []
+
+    def get_table_indexes(self, table_name):
+        """獲取表格的所有索引"""
+        if not self.connection:
+            return []
+
+        try:
+            cursor = self.connection.cursor()
+
+            # 獲取所有索引
+            cursor.execute(f"PRAGMA index_list({table_name});")
+            indexes = cursor.fetchall()
+
+            index_details = []
+            for index in indexes:
+                index_name = index[1]
+                is_unique = index[2]
+                is_primary = index[3]
+
+                # 獲取索引的欄位信息
+                cursor.execute(f"PRAGMA index_info({index_name});")
+                index_columns = cursor.fetchall()
+
+                index_detail = {
+                    'name': index_name,
+                    'unique': bool(is_unique),
+                    'primary': bool(is_primary),
+                    'columns': [{'name': col[2], 'seqno': col[0]} for col in index_columns]
+                }
+                index_details.append(index_detail)
+
+            return index_details
+
+        except Exception as e:
+            print(f"獲取表格索引時發生錯誤: {e}")
             return []
 
     def get_table_data(self, table_name):

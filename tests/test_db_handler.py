@@ -79,13 +79,57 @@ class TestDBHandler(unittest.TestCase):
         self.assertEqual(data[0][1], 'test1')
         self.assertEqual(data[1][1], 'test2')
     
+    def test_get_table_indexes(self):
+        """測試獲取表格索引"""
+        # 創建一個帶索引的測試表格
+        conn = sqlite3.connect(self.temp_db_path)
+        cursor = conn.cursor()
+
+        # 創建帶索引的表格
+        cursor.execute("CREATE TABLE indexed_table (id INTEGER PRIMARY KEY, name TEXT UNIQUE, email TEXT)")
+        cursor.execute("CREATE INDEX idx_email ON indexed_table(email)")
+        cursor.execute("INSERT INTO indexed_table (name, email) VALUES ('test1', 'test1@example.com')")
+        cursor.execute("INSERT INTO indexed_table (name, email) VALUES ('test2', 'test2@example.com')")
+        conn.commit()
+        conn.close()
+
+        # 測試獲取索引
+        indexes = self.db_handler.get_table_indexes('indexed_table')
+        self.assertIsInstance(indexes, list)
+        self.assertGreater(len(indexes), 0)
+
+        # 檢查至少有一個索引
+        self.assertGreater(len(indexes), 0)
+
+        # 檢查索引的基本結構
+        for index in indexes:
+            self.assertIn('name', index)
+            self.assertIn('unique', index)
+            self.assertIn('primary', index)
+            self.assertIn('columns', index)
+            self.assertIsInstance(index['columns'], list)
+
+        # 檢查主鍵索引（SQLite 會為主鍵自動創建索引）
+        primary_indexes = [idx for idx in indexes if idx['primary']]
+        self.assertGreater(len(primary_indexes), 0)
+
+        # 檢查唯一索引（SQLite 會為 UNIQUE 約束創建索引）
+        unique_indexes = [idx for idx in indexes if idx['unique']]
+        self.assertGreater(len(unique_indexes), 0)
+
+        # 檢查我們手動創建的索引
+        email_index = next((idx for idx in indexes if idx['name'] == 'idx_email'), None)
+        self.assertIsNotNone(email_index)
+        self.assertEqual(len(email_index['columns']), 1)
+        self.assertEqual(email_index['columns'][0]['name'], 'email')
+
     def test_execute_query(self):
         """測試執行 SQL 查詢"""
         # 執行 SELECT 查詢
         result = self.db_handler.execute_query("SELECT * FROM test_table")
         self.assertIsNotNone(result)
         self.assertEqual(len(result), 3) # header + 2 rows
-        
+
         # 執行 INSERT 查詢
         result = self.db_handler.execute_query("INSERT INTO test_table (name) VALUES ('test_name2')")
         self.assertIsNone(result)

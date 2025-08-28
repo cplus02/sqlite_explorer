@@ -2,12 +2,12 @@
 import sys
 import os
 import re
-from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QTableView, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QDialog, QTreeWidget, QTreeWidgetItem, QHeaderView, QSplitter, QStackedWidget, QStatusBar, QLabel, QFrame, QListWidgetItem, QToolBar, QAction, QSizePolicy, QMessageBox, QLineEdit, QCheckBox, QAbstractItemView
+from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QTableView, QWidget, QHBoxLayout, QVBoxLayout, QTextEdit, QPushButton, QDialog, QTreeWidget, QTreeWidgetItem, QHeaderView, QSplitter, QStackedWidget, QStatusBar, QLabel, QComboBox, QFrame, QListWidgetItem, QToolBar, QAction, QSizePolicy, QMessageBox, QLineEdit, QCheckBox, QScrollArea, QGridLayout
 from PyQt5.QtCore import Qt, QTimer, QSize
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QFont, QColor, QIcon, QSyntaxHighlighter, QTextCharFormat
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QFont, QColor, QIcon, QSyntaxHighlighter, QTextCharFormat, QPixmap, QPainter, QBrush, QLinearGradient, QPainterPath
 from db_handler import DBHandler
 from config import ConfigManager
-from dialogs import AddConnectionDialog, RecordEditDialog
+from dialogs import ConnectionsDialog, AddConnectionDialog, RecordEditDialog
 
 class SQLSyntaxHighlighter(QSyntaxHighlighter):
     """簡單的 SQL 語法高亮器"""
@@ -341,6 +341,7 @@ class MainWindow(QMainWindow):
     def toggle_edit_mode(self):
         """切換編輯模式"""
         if self.pending_changes:
+            from PyQt5.QtWidgets import QMessageBox
             reply = QMessageBox.question(self, 'Unsaved Changes',
                                        'You have unsaved changes. Do you want to commit them before switching modes?',
                                        QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,
@@ -1837,24 +1838,27 @@ class MainWindow(QMainWindow):
 
                             index_item = QTreeWidgetItem([index_text])
                             index_item.setData(0, Qt.UserRole, {
-                            'type': 'index',
-                            'table': table_name,
-                            'name': index_name,
-                            'unique': is_unique,
-                            'primary': is_primary,
-                            'columns': columns
-                            })
-                            # 根據索引類型設置顏色
-                            if is_primary:
-                                index_item.setForeground(0, QColor(52, 152, 219))  # 藍色
-                            elif is_unique:
-                                index_item.setForeground(0, QColor(155, 89, 182))  # 紫色
-                            else:
-                                index_item.setForeground(0, QColor(46, 204, 113))  # 綠色
-                            # 添加索引詳細狀態信息
-                            self.add_index_status_details(index_item, table_name, index_info)
-                            indexes_parent.addChild(index_item)
-                            table_item.addChild(indexes_parent)
+                                'type': 'index',
+                                'table': table_name,
+                                'name': index_name,
+                                'unique': is_unique,
+                                'primary': is_primary,
+                                'columns': columns
+                             })
+
+                             # 根據索引類型設置顏色
+                             if is_primary:
+                                 index_item.setForeground(0, QColor(52, 152, 219))  # 藍色
+                             elif is_unique:
+                                 index_item.setForeground(0, QColor(155, 89, 182))  # 紫色
+                             else:
+                                 index_item.setForeground(0, QColor(46, 204, 113))  # 綠色
+
+                             # 添加索引詳細狀態信息
+                             self.add_index_status_details(index_item, table_name, index_info)
+                             indexes_parent.addChild(index_item)
+
+                        table_item.addChild(indexes_parent)
 
                 except Exception as e:
                     error_item = QTreeWidgetItem([f"❌ Error loading indexes: {str(e)}"])
@@ -1961,15 +1965,16 @@ class MainWindow(QMainWindow):
                             })
 
                              # 根據索引類型設置顏色
-                            if is_primary:
-                                index_item.setForeground(0, QColor(52, 152, 219))  # 藍色
-                            elif is_unique:
-                                index_item.setForeground(0, QColor(155, 89, 182))  # 紫色
-                            else:
-                                index_item.setForeground(0, QColor(46, 204, 113))  # 綠色
-                                                        # 添加索引詳細狀態信息
-                            self.add_index_status_details(index_item, table_name, index_info)
-                            indexes_parent.addChild(index_item)
+                             if is_primary:
+                                 index_item.setForeground(0, QColor(52, 152, 219))  # 藍色
+                             elif is_unique:
+                                 index_item.setForeground(0, QColor(155, 89, 182))  # 紫色
+                             else:
+                                 index_item.setForeground(0, QColor(46, 204, 113))  # 綠色
+
+                             # 添加索引詳細狀態信息
+                             self.add_index_status_details(index_item, table_name, index_info)
+                             indexes_parent.addChild(index_item)
 
                         table_item.addChild(indexes_parent)
 

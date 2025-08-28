@@ -12,7 +12,7 @@ import os
 class DeleteConfirmDialog(QDialog):
     def __init__(self, parent, item_name):
         super().__init__(parent)
-        self.setWindowTitle("Delete Connection")
+        self.setWindowTitle("刪除連接")
 
         self.layout = QVBoxLayout(self)
 
@@ -21,15 +21,15 @@ class DeleteConfirmDialog(QDialog):
         font = self.icon_label.font()
         font.setPointSize(24)
         self.icon_label.setFont(font)
-        self.message_label = QLabel(f"Are you sure you want to delete '{item_name}'?")
+        self.message_label = QLabel(f"確定要刪除 '{item_name}' 嗎？")
 
         self.main_layout.addWidget(self.icon_label)
         self.main_layout.addWidget(self.message_label)
 
         self.buttons_layout = QHBoxLayout()
-        self.yes_button = QPushButton("Yes")
+        self.yes_button = QPushButton("是")
         self.yes_button.clicked.connect(self.accept)
-        self.no_button = QPushButton("No")
+        self.no_button = QPushButton("否")
         self.no_button.clicked.connect(self.reject)
         self.no_button.setDefault(True)
 
@@ -43,7 +43,7 @@ class DeleteConfirmDialog(QDialog):
 class ConnectionsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Manage Connections")
+        self.setWindowTitle("管理連接")
         self.config_manager = ConfigManager()
         self.selected_connection = None
 
@@ -55,15 +55,15 @@ class ConnectionsDialog(QDialog):
         self.layout.addWidget(self.connections_list)
 
         self.buttons_layout = QHBoxLayout()
-        self.connect_button = QPushButton("Connect")
+        self.connect_button = QPushButton("連接")
         self.connect_button.clicked.connect(self.accept)
-        self.add_button = QPushButton("Add")
+        self.add_button = QPushButton("新增")
         self.add_button.clicked.connect(self.add_connection)
-        self.edit_button = QPushButton("Edit")
+        self.edit_button = QPushButton("編輯")
         self.edit_button.clicked.connect(self.edit_connection)
-        self.delete_button = QPushButton("Delete")
+        self.delete_button = QPushButton("刪除")
         self.delete_button.clicked.connect(self.delete_connection)
-        self.quit_button = QPushButton("Quit")
+        self.quit_button = QPushButton("退出")
         self.quit_button.clicked.connect(self.reject)
 
         self.buttons_layout.addWidget(self.connect_button)
@@ -101,7 +101,7 @@ class ConnectionsDialog(QDialog):
     def edit_connection(self):
         selected_item = self.connections_list.currentItem()
         if not selected_item:
-            QMessageBox.warning(self, "Warning", "Please select a connection to edit.")
+            QMessageBox.warning(self, "警告", "請選擇要編輯的連接。")
             return
 
         old_name = selected_item.text()
@@ -122,7 +122,7 @@ class ConnectionsDialog(QDialog):
     def accept(self):
         selected_item = self.connections_list.currentItem()
         if not selected_item:
-            QMessageBox.warning(self, "Warning", "Please select a connection.")
+            QMessageBox.warning(self, "警告", "請選擇一個連接。")
             return
         self.selected_connection = selected_item.text()
         super().accept()
@@ -130,7 +130,7 @@ class ConnectionsDialog(QDialog):
 class AddConnectionDialog(QDialog):
     def __init__(self, parent=None, connection_name=None):
         super().__init__(parent)
-        self.setWindowTitle("Add/Edit Connection")
+        self.setWindowTitle("新增/編輯連接")
         self.config_manager = ConfigManager()
         self.connection_name = connection_name
 
@@ -140,23 +140,23 @@ class AddConnectionDialog(QDialog):
         self.form_layout = QFormLayout()
         
         self.name_edit = QLineEdit()
-        self.form_layout.addRow("Connection Name:", self.name_edit)
+        self.form_layout.addRow("連接名稱:", self.name_edit)
         
         self.path_layout = QHBoxLayout()
         self.path_edit = QLineEdit()
-        self.browse_button = QPushButton("Browse")
+        self.browse_button = QPushButton("瀏覽")
         self.browse_button.clicked.connect(self.browse_file)
         self.path_layout.addWidget(self.path_edit)
         self.path_layout.addWidget(self.browse_button)
         
-        self.form_layout.addRow("Database Path:", self.path_layout)
+        self.form_layout.addRow("資料庫路徑:", self.path_layout)
         
         self.layout.addLayout(self.form_layout)
 
         self.buttons_layout = QHBoxLayout()
-        self.save_button = QPushButton("Save")
+        self.save_button = QPushButton("儲存")
         self.save_button.clicked.connect(self.save_connection)
-        self.cancel_button = QPushButton("Cancel")
+        self.cancel_button = QPushButton("取消")
         self.cancel_button.clicked.connect(self.reject)
 
         self.buttons_layout.addStretch()
@@ -426,13 +426,13 @@ class RecordEditDialog(QDialog):
         layout.setSpacing(8)
         
         # 取消按鈕
-        self.cancel_btn = QPushButton("Cancel")
+        self.cancel_btn = QPushButton("取消")
         self.cancel_btn.clicked.connect(self.reject)
         self.cancel_btn.setMinimumWidth(80)
         self.cancel_btn.setFixedHeight(28)
-        
+
         # 保存按鈕
-        save_text = "Save" if self.row_data else "Add"
+        save_text = "儲存" if self.row_data else "新增"
         self.save_btn = QPushButton(save_text)
         self.save_btn.clicked.connect(self.accept)
         self.save_btn.setMinimumWidth(80)
@@ -622,11 +622,11 @@ class DataEditDialog(QDialog):
         toolbar_layout.setContentsMargins(0, 0, 0, 0)
         
         # 新增行按鈕
-        self.add_row_btn = QPushButton("Add Row")
+        self.add_row_btn = QPushButton("新增行")
         self.add_row_btn.clicked.connect(self.add_row)
-        
+
         # 刪除行按鈕
-        self.delete_row_btn = QPushButton("Delete Row")
+        self.delete_row_btn = QPushButton("刪除行")
         self.delete_row_btn.clicked.connect(self.delete_row)
         self.delete_row_btn.setEnabled(False)
         
@@ -682,12 +682,12 @@ class DataEditDialog(QDialog):
         button_layout.setSpacing(8)
         
         # 取消按鈕
-        self.cancel_btn = QPushButton("Cancel")
+        self.cancel_btn = QPushButton("取消")
         self.cancel_btn.clicked.connect(self.reject)
         self.cancel_btn.setMinimumHeight(32)
-        
+
         # 儲存按鈕
-        self.save_btn = QPushButton("Save Changes")
+        self.save_btn = QPushButton("儲存變更")
         self.save_btn.clicked.connect(self.accept)
         self.save_btn.setMinimumHeight(32)
         
